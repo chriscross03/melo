@@ -23,6 +23,7 @@ function App() {
   const [artists, setArtists] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [ratings, setRatings] = useState({});
 
   useEffect(() => {
     // API Access Token
@@ -91,9 +92,13 @@ function App() {
     );
   }
   function handleRating(rating) {
-    console.log(`Rated "${selectedCard?.name}" as: ${rating}`);
-    // TODO: Save to backend or local state if needed
-    setShowModal(false); // close the modal after rating
+    if (!selectedCard?.id) return;
+    setRatings((prev) => ({
+      ...prev,
+      [selectedCard.id]: rating,
+    }));
+    console.log(`Rated "${selectedCard.name}" as: ${rating}`);
+    setShowModal(false);
   }
 
   return (
@@ -202,20 +207,55 @@ function App() {
         <h3>Albums</h3>
         <Row className="mx-2 row row-cols-4">
           {albums.map((album, i) => (
-            <Card
+            <div
               key={i}
-              className="m-2"
-              onClick={() => {
-                setSelectedCard(album);
-                setShowModal(true);
+              style={{
+                position: "relative",
+                display: "inline-block",
+                zIndex: 0,
               }}
-              style={{ cursor: "pointer" }}
             >
-              <Card.Img src={album.images?.[0]?.url} />
-              <Card.Body>
-                <Card.Title>{album.name}</Card.Title>
-              </Card.Body>
-            </Card>
+              {ratings[album.id] && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    backgroundColor:
+                      ratings[album.id] === "liked"
+                        ? "#81C784"
+                        : ratings[album.id] === "fine"
+                        ? "#FFF176"
+                        : "#E57373",
+                    color: "#000",
+                    padding: "4px 8px",
+                    borderRadius: 12,
+                    fontSize: 12,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {ratings[album.id] === "liked"
+                    ? "👍 Liked"
+                    : ratings[album.id] === "fine"
+                    ? "😐 Fine"
+                    : "👎 Nope"}
+                </div>
+              )}
+
+              <Card
+                className="m-2"
+                onClick={() => {
+                  setSelectedCard(album);
+                  setShowModal(true);
+                }}
+                style={{ cursor: "pointer", zIndex: 1 }}
+              >
+                <Card.Img src={album.images?.[0]?.url} />
+                <Card.Body>
+                  <Card.Title>{album.name}</Card.Title>
+                </Card.Body>
+              </Card>
+            </div>
           ))}
         </Row>
 
