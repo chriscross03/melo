@@ -61,24 +61,30 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         return {
-          tracks:
-            data.tracks?.items?.map((item) => ({
-              id: item.id,
-              name: item.name,
-              artist: item.artists?.[0]?.name,
-            })) || [],
-          artists:
-            data.artists?.items?.map((item) => ({
-              id: item.id,
-              name: item.name,
-            })) || [],
-          albums:
-            data.albums?.items?.map((item) => ({
-              id: item.id,
-              name: item.name,
-            })) || [],
+          artists: data.artists.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+          })),
+          albums: data.albums.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+          })),
+          tracks: data.tracks.items.map((item) => ({
+            id: item.id,
+            name: item.name,
+          })),
         };
       });
+
+    searchResults.artists.forEach((artist, i) => {
+      console.log(`${i + 1}. ${artist.name} (ID: ${artist.id})`);
+    });
+    searchResults.albums.forEach((album, i) => {
+      console.log(`${i + 1}. ${album.name} (ID: ${album.id})`);
+    });
+    searchResults.tracks.forEach((track, i) => {
+      console.log(`${i + 1}. ${track.name} (ID: ${track.id})`);
+    });
 
     // Display those albums to the user
   }
@@ -104,7 +110,6 @@ function App() {
         <h3>Albums</h3>
         <Row className="mx-2 row row-cols-4">
           {albums.map((album, i) => {
-            console.log("Album:", album); // 👈 This logs each album
             return (
               <Card key={i} className="m-2">
                 <Card.Img src={album.images?.[0]?.url} />
