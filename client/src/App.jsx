@@ -10,6 +10,7 @@ import {
   Card,
 } from "react-bootstrap";
 import { useState, useEffect } from "react";
+import { Modal } from "react-bootstrap";
 
 const CLIENT_ID = "0842ae76a4a94dca9c80f872d67ac85d";
 const CLIENT_SECRET = "eee5acafb8e8409fb2411f0975276fc8";
@@ -20,6 +21,8 @@ function App() {
   const [albums, setAlbums] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [artists, setArtists] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   useEffect(() => {
     // API Access Token
@@ -87,9 +90,98 @@ function App() {
       })) || []
     );
   }
+  function handleRating(rating) {
+    console.log(`Rated "${selectedCard?.name}" as: ${rating}`);
+    // TODO: Save to backend or local state if needed
+    setShowModal(false); // close the modal after rating
+  }
 
   return (
     <div className="App">
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{selectedCard?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedCard?.images?.[0]?.url && (
+            <img
+              src={selectedCard.images[0].url}
+              alt={selectedCard.name}
+              style={{ width: "100%", borderRadius: "12px" }}
+            />
+          )}
+          <p style={{ marginTop: "1rem" }}>How was it?</p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-around",
+              marginTop: "1rem",
+              textAlign: "center",
+            }}
+          >
+            <div onClick={() => handleRating("liked")}>
+              <div
+                style={{
+                  backgroundColor: "#C8E6C9",
+                  borderRadius: "50%",
+                  width: 60,
+                  height: 60,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 24,
+                  marginBottom: 8,
+                }}
+              >
+                👍
+              </div>
+              <div style={{ fontSize: 14, color: "#444" }}>I liked it!</div>
+            </div>
+
+            <div onClick={() => handleRating("fine")}>
+              <div
+                style={{
+                  backgroundColor: "#FFF9C4",
+                  borderRadius: "50%",
+                  width: 60,
+                  height: 60,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 24,
+                  marginBottom: 8,
+                }}
+              >
+                😐
+              </div>
+              <div style={{ fontSize: 14, color: "#444" }}>It was fine</div>
+            </div>
+
+            <div onClick={() => handleRating("disliked")}>
+              <div
+                style={{
+                  backgroundColor: "#FFCDD2",
+                  borderRadius: "50%",
+                  width: 60,
+                  height: 60,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 24,
+                  marginBottom: 8,
+                }}
+              >
+                👎
+              </div>
+              <div style={{ fontSize: 14, color: "#444" }}>
+                I didn’t like it
+              </div>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+
       <Container>
         <InputGroup className="mb-3" size="lg">
           <FormControl
@@ -109,16 +201,22 @@ function App() {
       <Container>
         <h3>Albums</h3>
         <Row className="mx-2 row row-cols-4">
-          {albums.map((album, i) => {
-            return (
-              <Card key={i} className="m-2">
-                <Card.Img src={album.images?.[0]?.url} />
-                <Card.Body>
-                  <Card.Title>{album.name}</Card.Title>
-                </Card.Body>
-              </Card>
-            );
-          })}
+          {albums.map((album, i) => (
+            <Card
+              key={i}
+              className="m-2"
+              onClick={() => {
+                setSelectedCard(album);
+                setShowModal(true);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <Card.Img src={album.images?.[0]?.url} />
+              <Card.Body>
+                <Card.Title>{album.name}</Card.Title>
+              </Card.Body>
+            </Card>
+          ))}
         </Row>
 
         <h3 className="mt-4">Tracks</h3>
