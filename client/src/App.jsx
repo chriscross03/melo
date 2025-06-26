@@ -43,7 +43,6 @@ function App() {
   async function search() {
     console.log("Search for " + searchInput);
 
-    // Get request using search to get the Artist ID
     var searchParameters = {
       method: "GET",
       headers: {
@@ -52,42 +51,43 @@ function App() {
       },
     };
 
-    const searchResults = await fetch(
+    const data = await fetch(
       "https://api.spotify.com/v1/search?q=" +
         searchInput +
         "&type=artist,track,album&limit=10",
       searchParameters
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        return {
-          artists: data.artists.items.map((item) => ({
-            id: item.id,
-            name: item.name,
-          })),
-          albums: data.albums.items.map((item) => ({
-            id: item.id,
-            name: item.name,
-          })),
-          tracks: data.tracks.items.map((item) => ({
-            id: item.id,
-            name: item.name,
-          })),
-        };
-      });
+    ).then((response) => response.json());
 
-    searchResults.artists.forEach((artist, i) => {
-      console.log(`${i + 1}. ${artist.name} (ID: ${artist.id})`);
-    });
-    searchResults.albums.forEach((album, i) => {
-      console.log(`${i + 1}. ${album.name} (ID: ${album.id})`);
-    });
-    searchResults.tracks.forEach((track, i) => {
-      console.log(`${i + 1}. ${track.name} (ID: ${track.id})`);
-    });
+    // Log full response for debugging
+    console.log("Spotify API Response:", data);
 
-    // Display those albums to the user
+    // Set state with full required info
+    setArtists(
+      data.artists?.items?.map((item) => ({
+        id: item.id,
+        name: item.name,
+        image: item.images?.[0]?.url || null,
+      })) || []
+    );
+
+    setAlbums(
+      data.albums?.items?.map((item) => ({
+        id: item.id,
+        name: item.name,
+        images: item.images || [], // You use images[0] in JSX
+      })) || []
+    );
+
+    setTracks(
+      data.tracks?.items?.map((item) => ({
+        id: item.id,
+        name: item.name,
+        artist: item.artists?.[0]?.name || "Unknown",
+        image: item.album?.images?.[0]?.url || null,
+      })) || []
+    );
   }
+
   return (
     <div className="App">
       <Container>
