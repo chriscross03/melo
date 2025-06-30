@@ -26,6 +26,8 @@ function App() {
   const [ratings, setRatings] = useState({});
   const [showComparison, setShowComparison] = useState(false);
   const [comparisonTarget, setComparisonTarget] = useState(null);
+  const [binaryCompareQueue, setBinaryCompareQueue] = useState([]);
+  const [binaryIndexRange, setBinaryIndexRange] = useState([0, 0]);
 
   useEffect(() => {
     // API Access Token
@@ -96,55 +98,85 @@ function App() {
   function handleRating(category) {
     if (!selectedCard?.id) return;
 
-    // Filter existing albums in same category
     const sameCategoryIds = Object.keys(ratings).filter(
       (id) => ratings[id].category === category
     );
 
     if (sameCategoryIds.length === 0) {
-      // No other rated album in this category, assign default score
-      const defaultScore =
-        category === "liked" ? 10.0 : category === "fine" ? 5.0 : 1.0;
-
       setRatings((prev) => ({
         ...prev,
-        [selectedCard.id]: { category, score: defaultScore },
+        [selectedCard.id]: { category, score: 10.0 },
       }));
       setShowModal(false);
-      setShowComparison(false);
-    } else {
-      // Pick random album from same category for comparison
-      const randomId =
-        sameCategoryIds[Math.floor(Math.random() * sameCategoryIds.length)];
-      const targetAlbum = albums.find((a) => a.id === randomId);
-
-      setComparisonTarget(targetAlbum);
-      setShowComparison(true);
-      setShowModal(false);
+      return;
     }
+
+    const sortedIds = sameCategoryIds
+      .map((id) => ({ id, score: ratings[id].score }))
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.id);
+
+    setBinaryCompareQueue(sortedIds);
+    setBinaryIndexRange([0, sortedIds.length - 1]);
+
+    const mid = Math.floor((0 + sortedIds.length - 1) / 2);
+    const target = albums.find((a) => a.id === sortedIds[mid]);
+
+    setComparisonTarget(target);
+    setShowComparison(true);
+    setShowModal(false);
   }
 
   function finishComparison(preferred) {
     if (!comparisonTarget || !selectedCard) return;
 
     const category = ratings[comparisonTarget.id].category;
-    const existingScore = ratings[comparisonTarget.id].score;
-    const reducedScore = parseFloat((existingScore - 0.1).toFixed(2));
 
-    let newRatings = { ...ratings };
+    const sortedEntries = binaryCompareQueue
+      .map((id) => ({
+        id,
+        score: ratings[id].score,
+      }))
+      .sort((a, b) => b.score - a.score);
+
+    let [min, max] = binaryIndexRange;
+    const mid = Math.floor((min + max) / 2);
+    const midId = sortedEntries[mid].id;
 
     if (preferred.id === selectedCard.id) {
-      // User prefers new album
-      newRatings[selectedCard.id] = { category, score: existingScore };
-      newRatings[comparisonTarget.id] = { category, score: reducedScore };
+      max = mid - 1;
     } else {
-      // User prefers existing album
-      newRatings[selectedCard.id] = { category, score: reducedScore };
-      // Existing album keeps its score
+      min = mid + 1;
     }
 
-    setRatings(newRatings);
-    setShowComparison(false);
+    if (min > max) {
+      // Insert point is at 'min'
+      const newList = [...sortedEntries];
+      newList.splice(min, 0, { id: selectedCard.id }); // Insert new album
+
+      // Assign descending scores from 10.0 down
+      const newRatings = { ...ratings };
+      for (let i = 0; i < newList.length; i++) {
+        const id = newList[i].id;
+        newRatings[id] = {
+          category,
+          score: parseFloat((10.0 - i * 0.1).toFixed(2)),
+        };
+      }
+
+      setRatings(newRatings);
+      setShowComparison(false);
+      setBinaryCompareQueue([]);
+      return;
+    }
+
+    // Continue next comparison
+    const nextMid = Math.floor((min + max) / 2);
+    const nextId = sortedEntries[nextMid].id;
+    const nextTarget = albums.find((a) => a.id === nextId);
+
+    setComparisonTarget(nextTarget);
+    setBinaryIndexRange([min, max]);
   }
 
   return (
