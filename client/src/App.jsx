@@ -24,6 +24,8 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [ratings, setRatings] = useState({});
+  const [showComparison, setShowComparison] = useState(false);
+  const [comparisonTarget, setComparisonTarget] = useState(null);
 
   useEffect(() => {
     // API Access Token
@@ -93,12 +95,36 @@ function App() {
   }
   function handleRating(rating) {
     if (!selectedCard?.id) return;
+
     setRatings((prev) => ({
       ...prev,
       [selectedCard.id]: rating,
     }));
-    console.log(`Rated "${selectedCard.name}" as: ${rating}`);
+
+    const ratedIds = Object.keys(ratings).filter(
+      (id) => id !== selectedCard.id
+    );
+
+    if (ratedIds.length > 0) {
+      // Pick a random previously rated album for comparison
+      const randomId = ratedIds[Math.floor(Math.random() * ratedIds.length)];
+      const targetAlbum = albums.find((a) => a.id === randomId);
+
+      setComparisonTarget(targetAlbum);
+      setShowComparison(true);
+    } else {
+      // No previous ratings, still show placeholder
+      setComparisonTarget(null);
+      setShowComparison(true);
+    }
+
     setShowModal(false);
+  }
+
+  function finishComparison(preferred) {
+    console.log(`User prefers: ${preferred.name}`);
+    // Optional: Update rankings or backend here
+    setShowComparison(false);
   }
 
   return (
@@ -187,12 +213,61 @@ function App() {
         </Modal.Body>
       </Modal>
 
+      <Modal
+        show={showComparison}
+        onHide={() => setShowComparison(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {comparisonTarget ? "Which do you prefer?" : "Thanks for rating!"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {comparisonTarget ? (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-around" }}>
+                <div onClick={() => finishComparison(selectedCard)}>
+                  <img
+                    src={selectedCard.images?.[0]?.url}
+                    alt={selectedCard.name}
+                    style={{
+                      width: "100px",
+                      borderRadius: "12px",
+                      marginBottom: 8,
+                    }}
+                  />
+                  <p>{selectedCard.name}</p>
+                </div>
+
+                <div onClick={() => finishComparison(comparisonTarget)}>
+                  <img
+                    src={comparisonTarget.images?.[0]?.url}
+                    alt={comparisonTarget.name}
+                    style={{
+                      width: "100px",
+                      borderRadius: "12px",
+                      marginBottom: 8,
+                    }}
+                  />
+                  <p>{comparisonTarget.name}</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>
+              We’ll start showing comparisons once you’ve rated more albums!
+            </p>
+          )}
+        </Modal.Body>
+      </Modal>
+
       <Container>
         <InputGroup className="mb-3" size="lg">
           <FormControl
             placeholder="Search for Artist, Album, or Track"
             type="input"
-            onKeyPress={(event) => {
+            onKeyDown={(event) => {
               if (event.key === "Enter") {
                 search();
               }
