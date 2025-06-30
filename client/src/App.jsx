@@ -93,37 +93,57 @@ function App() {
       })) || []
     );
   }
-  function handleRating(rating) {
+  function handleRating(category) {
     if (!selectedCard?.id) return;
 
-    setRatings((prev) => ({
-      ...prev,
-      [selectedCard.id]: rating,
-    }));
-
-    const ratedIds = Object.keys(ratings).filter(
-      (id) => id !== selectedCard.id
+    // Filter existing albums in same category
+    const sameCategoryIds = Object.keys(ratings).filter(
+      (id) => ratings[id].category === category
     );
 
-    if (ratedIds.length > 0) {
-      // Pick a random previously rated album for comparison
-      const randomId = ratedIds[Math.floor(Math.random() * ratedIds.length)];
+    if (sameCategoryIds.length === 0) {
+      // No other rated album in this category, assign default score
+      const defaultScore =
+        category === "liked" ? 10.0 : category === "fine" ? 5.0 : 1.0;
+
+      setRatings((prev) => ({
+        ...prev,
+        [selectedCard.id]: { category, score: defaultScore },
+      }));
+      setShowModal(false);
+      setShowComparison(false);
+    } else {
+      // Pick random album from same category for comparison
+      const randomId =
+        sameCategoryIds[Math.floor(Math.random() * sameCategoryIds.length)];
       const targetAlbum = albums.find((a) => a.id === randomId);
 
       setComparisonTarget(targetAlbum);
       setShowComparison(true);
-    } else {
-      // No previous ratings, still show placeholder
-      setComparisonTarget(null);
-      setShowComparison(true);
+      setShowModal(false);
     }
-
-    setShowModal(false);
   }
 
   function finishComparison(preferred) {
-    console.log(`User prefers: ${preferred.name}`);
-    // Optional: Update rankings or backend here
+    if (!comparisonTarget || !selectedCard) return;
+
+    const category = ratings[comparisonTarget.id].category;
+    const existingScore = ratings[comparisonTarget.id].score;
+    const reducedScore = parseFloat((existingScore - 0.1).toFixed(2));
+
+    let newRatings = { ...ratings };
+
+    if (preferred.id === selectedCard.id) {
+      // User prefers new album
+      newRatings[selectedCard.id] = { category, score: existingScore };
+      newRatings[comparisonTarget.id] = { category, score: reducedScore };
+    } else {
+      // User prefers existing album
+      newRatings[selectedCard.id] = { category, score: reducedScore };
+      // Existing album keeps its score
+    }
+
+    setRatings(newRatings);
     setShowComparison(false);
   }
 
@@ -286,8 +306,6 @@ function App() {
               key={i}
               style={{
                 position: "relative",
-                display: "inline-block",
-                zIndex: 0,
               }}
             >
               {ratings[album.id] && (
@@ -297,9 +315,9 @@ function App() {
                     top: 8,
                     right: 8,
                     backgroundColor:
-                      ratings[album.id] === "liked"
+                      ratings[album.id].category === "liked"
                         ? "#81C784"
-                        : ratings[album.id] === "fine"
+                        : ratings[album.id].category === "fine"
                         ? "#FFF176"
                         : "#E57373",
                     color: "#000",
@@ -307,13 +325,10 @@ function App() {
                     borderRadius: 12,
                     fontSize: 12,
                     fontWeight: "bold",
+                    zIndex: 2, // Badge appears above the card
                   }}
                 >
-                  {ratings[album.id] === "liked"
-                    ? "👍 Liked"
-                    : ratings[album.id] === "fine"
-                    ? "😐 Fine"
-                    : "👎 Nope"}
+                  {ratings[album.id].score.toFixed(1)}
                 </div>
               )}
 
@@ -323,7 +338,7 @@ function App() {
                   setSelectedCard(album);
                   setShowModal(true);
                 }}
-                style={{ cursor: "pointer", zIndex: 1 }}
+                style={{ cursor: "pointer", position: "relative", zIndex: 1 }}
               >
                 <Card.Img src={album.images?.[0]?.url} />
                 <Card.Body>
