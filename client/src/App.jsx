@@ -103,9 +103,13 @@ function App() {
     );
 
     if (sameCategoryIds.length === 0) {
+      let startScore = 10.0;
+      if (category === "fine") startScore = 5.0;
+      else if (category === "disliked") startScore = 1.0;
+
       setRatings((prev) => ({
         ...prev,
-        [selectedCard.id]: { category, score: 10.0 },
+        [selectedCard.id]: { category, score: startScore },
       }));
       setShowModal(false);
       return;
@@ -154,13 +158,18 @@ function App() {
       const newList = [...sortedEntries];
       newList.splice(min, 0, { id: selectedCard.id }); // Insert new album
 
-      // Assign descending scores from 10.0 down
+      // Determine starting score based on category
+      let startScore = 10.0;
+      if (category === "fine") startScore = 5.0;
+      else if (category === "disliked") startScore = 1.0;
+
+      // Assign descending scores
       const newRatings = { ...ratings };
       for (let i = 0; i < newList.length; i++) {
         const id = newList[i].id;
         newRatings[id] = {
           category,
-          score: parseFloat((10.0 - i * 0.1).toFixed(2)),
+          score: parseFloat((startScore - i * 0.1).toFixed(2)),
         };
       }
 
