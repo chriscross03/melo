@@ -28,6 +28,7 @@ function App() {
   const [comparisonTarget, setComparisonTarget] = useState(null);
   const [binaryCompareQueue, setBinaryCompareQueue] = useState([]);
   const [binaryIndexRange, setBinaryIndexRange] = useState([0, 0]);
+  const [ratedAlbums, setRatedAlbums] = useState([]);
 
   useEffect(() => {
     // API Access Token
@@ -97,7 +98,10 @@ function App() {
   }
   function handleRating(category) {
     if (!selectedCard?.id) return;
-
+    setRatedAlbums((prev) => {
+      if (prev.find((a) => a.id === selectedCard.id)) return prev;
+      return [...prev, selectedCard];
+    });
     const sameCategoryIds = Object.keys(ratings).filter(
       (id) => ratings[id].category === category
     );
@@ -124,7 +128,9 @@ function App() {
     setBinaryIndexRange([0, sortedIds.length - 1]);
 
     const mid = Math.floor((0 + sortedIds.length - 1) / 2);
-    const target = albums.find((a) => a.id === sortedIds[mid]);
+    const target =
+      albums.find((a) => a.id === sortedIds[mid]) ||
+      ratedAlbums.find((a) => a.id === sortedIds[mid]);
 
     setComparisonTarget(target);
     setShowComparison(true);
@@ -182,7 +188,9 @@ function App() {
     // Continue next comparison
     const nextMid = Math.floor((min + max) / 2);
     const nextId = sortedEntries[nextMid].id;
-    const nextTarget = albums.find((a) => a.id === nextId);
+    const nextTarget =
+      albums.find((a) => a.id === nextId) ||
+      ratedAlbums.find((a) => a.id === nextId);
 
     setComparisonTarget(nextTarget);
     setBinaryIndexRange([min, max]);
