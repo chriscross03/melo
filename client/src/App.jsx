@@ -475,9 +475,7 @@ function App() {
     const ranked = Object.entries(ratings)
       .filter(([id, data]) => data.category === category)
       .sort((a, b) => b[1].score - a[1].score)
-      .map(([id]) => {
-        return ratedAlbums.find((album) => album.id === id);
-      })
+      .map(([id]) => ratedAlbums.find((album) => album.id === id))
       .filter(Boolean); // Remove nulls in case album not found
 
     if (ranked.length === 0) {
@@ -485,17 +483,66 @@ function App() {
     }
 
     return (
-      <Row className="mx-2 row row-cols-4">
-        {ranked.map((album, i) => (
-          <Card key={i} className="m-2">
-            <Card.Img src={album.images?.[0]?.url} />
-            <Card.Body>
-              <Card.Title>{album.name}</Card.Title>
-              <Card.Text>Score: {ratings[album.id].score.toFixed(1)}</Card.Text>
-            </Card.Body>
-          </Card>
-        ))}
-      </Row>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {ranked.map((album, index) => {
+          const scoreData = ratings[album.id];
+          let scoreColor = "#81C784"; // green for liked
+
+          if (scoreData.category === "fine") scoreColor = "#FFD54F"; // yellow
+          if (scoreData.category === "disliked") scoreColor = "#E57373"; // red
+
+          return (
+            <div
+              key={album.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: "#fff",
+                padding: "10px",
+                borderRadius: "8px",
+                borderColor: "black",
+                border: "1px solid #1e1e1e",
+              }}
+            >
+              {/* Left: Index, Image, Info */}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <div style={{ width: "20px", color: "#aaa" }}>{index + 1}</div>
+                <img
+                  src={album.images?.[2]?.url}
+                  alt={album.name}
+                  style={{ width: "50px", height: "50px", borderRadius: "4px" }}
+                />
+                <div>
+                  <div style={{ fontWeight: "bold", color: "#1e1e1e" }}>
+                    {album.name}
+                  </div>
+                  <div style={{ color: "#bbb", fontSize: "0.9em" }}>
+                    {album.artists?.[0]?.name}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Score Badge */}
+              <div
+                style={{
+                  backgroundColor: scoreColor,
+                  color: "#000",
+                  padding: "4px 8px",
+                  borderRadius: "12px",
+                  minWidth: "40px",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                {scoreData.score.toFixed(1)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     );
   }
 }
