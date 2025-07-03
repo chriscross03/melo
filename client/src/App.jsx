@@ -29,6 +29,7 @@ function App() {
   const [binaryCompareQueue, setBinaryCompareQueue] = useState([]);
   const [binaryIndexRange, setBinaryIndexRange] = useState([0, 0]);
   const [ratedAlbums, setRatedAlbums] = useState([]);
+  const [currentTab, setCurrentTab] = useState("search");
 
   useEffect(() => {
     // API Access Token
@@ -332,99 +333,171 @@ function App() {
       </Modal>
 
       <Container>
-        <InputGroup className="mb-3" size="lg">
-          <FormControl
-            placeholder="Search for Artist, Album, or Track"
-            type="input"
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                search();
-              }
-            }}
-            onChange={(event) => setSearchInput(event.target.value)}
-          />
-          <Button onClick={search}>Search</Button>
-        </InputGroup>
-      </Container>
+        {/* Tab Navigation */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            margin: "20px 0",
+          }}
+        >
+          <Button
+            variant={currentTab === "search" ? "primary" : "outline-primary"}
+            onClick={() => setCurrentTab("search")}
+            style={{ marginRight: "10px" }}
+          >
+            Search
+          </Button>
+          <Button
+            variant={currentTab === "rankings" ? "primary" : "outline-primary"}
+            onClick={() => setCurrentTab("rankings")}
+          >
+            Rankings
+          </Button>
+        </div>
 
-      <Container>
-        <h3>Albums</h3>
-        <Row className="mx-2 row row-cols-4">
-          {albums.map((album, i) => (
-            <div
-              key={i}
-              style={{
-                position: "relative",
-              }}
-            >
-              {ratings[album.id] && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    backgroundColor:
-                      ratings[album.id].category === "liked"
-                        ? "#81C784"
-                        : ratings[album.id].category === "fine"
-                        ? "#FFF176"
-                        : "#E57373",
-                    color: "#000",
-                    padding: "4px 8px",
-                    borderRadius: 12,
-                    fontSize: 12,
-                    fontWeight: "bold",
-                    zIndex: 2, // Badge appears above the card
-                  }}
-                >
-                  {ratings[album.id].score.toFixed(1)}
-                </div>
-              )}
-
-              <Card
-                className="m-2"
-                onClick={() => {
-                  setSelectedCard(album);
-                  setShowModal(true);
+        {/* Conditional Content */}
+        {currentTab === "search" && (
+          <>
+            <InputGroup className="mb-3" size="lg">
+              <FormControl
+                placeholder="Search for Artist, Album, or Track"
+                type="input"
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    search();
+                  }
                 }}
-                style={{ cursor: "pointer", position: "relative", zIndex: 1 }}
-              >
-                <Card.Img src={album.images?.[0]?.url} />
-                <Card.Body>
-                  <Card.Title>{album.name}</Card.Title>
-                </Card.Body>
-              </Card>
-            </div>
-          ))}
-        </Row>
+                onChange={(event) => setSearchInput(event.target.value)}
+              />
+              <Button onClick={search}>Search</Button>
+            </InputGroup>
 
-        <h3 className="mt-4">Tracks</h3>
-        <Row className="mx-2 row row-cols-4">
-          {tracks.map((track, i) => (
-            <Card key={i} className="m-2">
-              <Card.Img src={track.image} />
-              <Card.Body>
-                <Card.Title>{track.name}</Card.Title>
-                <Card.Text>By {track.artist}</Card.Text>
-              </Card.Body>
-            </Card>
-          ))}
-        </Row>
+            <h3>Albums</h3>
+            <Row className="mx-2 row row-cols-4">
+              {albums.map((album, i) => (
+                <div key={i} style={{ position: "relative" }}>
+                  {ratings[album.id] && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        backgroundColor:
+                          ratings[album.id].category === "liked"
+                            ? "#81C784"
+                            : ratings[album.id].category === "fine"
+                            ? "#FFF176"
+                            : "#E57373",
+                        color: "#000",
+                        padding: "4px 8px",
+                        borderRadius: 12,
+                        fontSize: 12,
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    >
+                      {ratings[album.id].score.toFixed(1)}
+                    </div>
+                  )}
 
-        <h3 className="mt-4">Artists</h3>
-        <Row className="mx-2 row row-cols-4">
-          {artists.map((artist, i) => (
-            <Card key={i} className="m-2">
-              {artist.image && <Card.Img src={artist.image} />}
-              <Card.Body>
-                <Card.Title>{artist.name}</Card.Title>
-              </Card.Body>
-            </Card>
-          ))}
-        </Row>
+                  <Card
+                    className="m-2"
+                    onClick={() => {
+                      setSelectedCard(album);
+                      setShowModal(true);
+                    }}
+                    style={{
+                      cursor: "pointer",
+                      position: "relative",
+                      zIndex: 1,
+                    }}
+                  >
+                    <Card.Img src={album.images?.[0]?.url} />
+                    <Card.Body>
+                      <Card.Title>{album.name}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </div>
+              ))}
+            </Row>
+
+            <h3 className="mt-4">Tracks</h3>
+            <Row className="mx-2 row row-cols-4">
+              {tracks.map((track, i) => (
+                <Card key={i} className="m-2">
+                  <Card.Img src={track.image} />
+                  <Card.Body>
+                    <Card.Title>{track.name}</Card.Title>
+                    <Card.Text>By {track.artist}</Card.Text>
+                  </Card.Body>
+                </Card>
+              ))}
+            </Row>
+
+            <h3 className="mt-4">Artists</h3>
+            <Row className="mx-2 row row-cols-4">
+              {artists.map((artist, i) => (
+                <Card key={i} className="m-2">
+                  {artist.image && <Card.Img src={artist.image} />}
+                  <Card.Body>
+                    <Card.Title>{artist.name}</Card.Title>
+                  </Card.Body>
+                </Card>
+              ))}
+            </Row>
+          </>
+        )}
+
+        {currentTab === "rankings" && (
+          <>
+            <h3>Your Album Rankings</h3>
+            {ratedAlbums.length === 0 ? (
+              <p>You haven't rated any albums yet.</p>
+            ) : (
+              <>
+                <h5>Liked</h5>
+                {renderRankedList("liked")}
+
+                <h5 className="mt-3">Fine</h5>
+                {renderRankedList("fine")}
+
+                <h5 className="mt-3">Disliked</h5>
+                {renderRankedList("disliked")}
+              </>
+            )}
+          </>
+        )}
       </Container>
     </div>
   );
+  function renderRankedList(category) {
+    const ranked = Object.entries(ratings)
+      .filter(([id, data]) => data.category === category)
+      .sort((a, b) => b[1].score - a[1].score)
+      .map(([id]) => {
+        return ratedAlbums.find((album) => album.id === id);
+      })
+      .filter(Boolean); // Remove nulls in case album not found
+
+    if (ranked.length === 0) {
+      return <p>No albums rated in this category.</p>;
+    }
+
+    return (
+      <Row className="mx-2 row row-cols-4">
+        {ranked.map((album, i) => (
+          <Card key={i} className="m-2">
+            <Card.Img src={album.images?.[0]?.url} />
+            <Card.Body>
+              <Card.Title>{album.name}</Card.Title>
+              <Card.Text>Score: {ratings[album.id].score.toFixed(1)}</Card.Text>
+            </Card.Body>
+          </Card>
+        ))}
+      </Row>
+    );
+  }
 }
 
 export default App;
