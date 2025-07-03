@@ -73,3 +73,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 - completed the ranking implementation for "it was good" just need to make sure to do this for the other two categories
 - also work on being able to save these rankings after doing multiple searches/queries
+
+### 7/3:
+
+- completed ranking implementation for all categories over multiple searches/queries
+- also completed a temporary rankings tab to see all your albums saved, in a list-style form.
+- work on backend stuff like creating account and saving ranking data
