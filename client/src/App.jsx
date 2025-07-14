@@ -122,8 +122,10 @@ function App() {
 
     // Find all items of same type and category
     const sameCategoryIds = Object.keys(ratings).filter(
-      (id) =>
-        ratings[id].category === category && ratings[id].type === selectedType
+      (rid) =>
+        rid !== id &&
+        ratings[rid].category === category &&
+        ratings[rid].type === selectedType
     );
 
     if (sameCategoryIds.length === 0) {
