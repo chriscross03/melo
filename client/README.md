@@ -79,3 +79,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - completed ranking implementation for all categories over multiple searches/queries
 - also completed a temporary rankings tab to see all your albums saved, in a list-style form.
 - work on backend stuff like creating account and saving ranking data
+
+### 7/14
+
+- ranking tracks and artists
+- combined each list to one so it looks cleaner
+- work on backend
