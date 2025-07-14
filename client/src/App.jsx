@@ -29,6 +29,10 @@ function App() {
   const [binaryCompareQueue, setBinaryCompareQueue] = useState([]);
   const [binaryIndexRange, setBinaryIndexRange] = useState([0, 0]);
   const [ratedAlbums, setRatedAlbums] = useState([]);
+  const [ratedTracks, setRatedTracks] = useState([]);
+  const [ratedArtists, setRatedArtists] = useState([]);
+  const [selectedType, setSelectedType] = useState("album"); // "album", "track", or "artist"
+
   const [currentTab, setCurrentTab] = useState("search");
 
   useEffect(() => {
@@ -98,23 +102,37 @@ function App() {
     );
   }
   function handleRating(category) {
-    if (!selectedCard?.id) return;
-    setRatedAlbums((prev) => {
-      if (prev.find((a) => a.id === selectedCard.id)) return prev;
+    if (!selectedCard?.id || !selectedType) return;
+
+    const id = selectedCard.id;
+
+    // Determine the correct setRatedX function
+    const setRatedFn =
+      selectedType === "album"
+        ? setRatedAlbums
+        : selectedType === "track"
+        ? setRatedTracks
+        : setRatedArtists;
+
+    // Add to rated list if not already there
+    setRatedFn((prev) => {
+      if (prev.find((item) => item.id === id)) return prev;
       return [...prev, selectedCard];
     });
+
+    // Find all items of same type and category
     const sameCategoryIds = Object.keys(ratings).filter(
-      (id) => ratings[id].category === category
+      (id) =>
+        ratings[id].category === category && ratings[id].type === selectedType
     );
 
     if (sameCategoryIds.length === 0) {
-      let startScore = 10.0;
-      if (category === "fine") startScore = 5.0;
-      else if (category === "disliked") startScore = 1.0;
+      let startScore =
+        category === "fine" ? 5.0 : category === "disliked" ? 1.0 : 10.0;
 
       setRatings((prev) => ({
         ...prev,
-        [selectedCard.id]: { category, score: startScore },
+        [id]: { category, score: startScore, type: selectedType },
       }));
       setShowModal(false);
       return;
@@ -128,10 +146,22 @@ function App() {
     setBinaryCompareQueue(sortedIds);
     setBinaryIndexRange([0, sortedIds.length - 1]);
 
+    const allRated =
+      selectedType === "album"
+        ? ratedAlbums
+        : selectedType === "track"
+        ? ratedTracks
+        : ratedArtists;
+
     const mid = Math.floor((0 + sortedIds.length - 1) / 2);
     const target =
-      albums.find((a) => a.id === sortedIds[mid]) ||
-      ratedAlbums.find((a) => a.id === sortedIds[mid]);
+      (selectedType === "album"
+        ? albums
+        : selectedType === "track"
+        ? tracks
+        : artists
+      ).find((a) => a.id === sortedIds[mid]) ||
+      allRated.find((a) => a.id === sortedIds[mid]);
 
     setComparisonTarget(target);
     setShowComparison(true);
@@ -141,7 +171,9 @@ function App() {
   function finishComparison(preferred) {
     if (!comparisonTarget || !selectedCard) return;
 
+    const id = selectedCard.id;
     const category = ratings[comparisonTarget.id].category;
+    const type = selectedType;
 
     const sortedEntries = binaryCompareQueue
       .map((id) => ({
@@ -154,29 +186,26 @@ function App() {
     const mid = Math.floor((min + max) / 2);
     const midId = sortedEntries[mid].id;
 
-    if (preferred.id === selectedCard.id) {
+    if (preferred.id === id) {
       max = mid - 1;
     } else {
       min = mid + 1;
     }
 
     if (min > max) {
-      // Insert point is at 'min'
       const newList = [...sortedEntries];
-      newList.splice(min, 0, { id: selectedCard.id }); // Insert new album
+      newList.splice(min, 0, { id });
 
-      // Determine starting score based on category
-      let startScore = 10.0;
-      if (category === "fine") startScore = 5.0;
-      else if (category === "disliked") startScore = 1.0;
-
-      // Assign descending scores
+      let startScore =
+        category === "fine" ? 5.0 : category === "disliked" ? 1.0 : 10.0;
       const newRatings = { ...ratings };
+
       for (let i = 0; i < newList.length; i++) {
-        const id = newList[i].id;
-        newRatings[id] = {
+        const itemId = newList[i].id;
+        newRatings[itemId] = {
           category,
           score: parseFloat((startScore - i * 0.1).toFixed(2)),
+          type,
         };
       }
 
@@ -186,12 +215,20 @@ function App() {
       return;
     }
 
-    // Continue next comparison
     const nextMid = Math.floor((min + max) / 2);
     const nextId = sortedEntries[nextMid].id;
+
+    const allRated =
+      type === "album"
+        ? ratedAlbums
+        : type === "track"
+        ? ratedTracks
+        : ratedArtists;
+
     const nextTarget =
-      albums.find((a) => a.id === nextId) ||
-      ratedAlbums.find((a) => a.id === nextId);
+      (type === "album" ? albums : type === "track" ? tracks : artists).find(
+        (a) => a.id === nextId
+      ) || allRated.find((a) => a.id === nextId);
 
     setComparisonTarget(nextTarget);
     setBinaryIndexRange([min, max]);
@@ -204,15 +241,28 @@ function App() {
           <Modal.Title>{selectedCard?.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedCard?.images?.[0]?.url && (
+          {selectedType === "album" && selectedCard?.images?.[0]?.url && (
             <img
               src={selectedCard.images[0].url}
               alt={selectedCard.name}
               style={{ width: "100%", borderRadius: "12px" }}
             />
           )}
+          {selectedType === "artist" && (
+            <img
+              src={selectedCard.image}
+              alt={selectedCard.name}
+              style={{ width: "100%", borderRadius: "12px" }}
+            />
+          )}
+          {selectedType === "track" && (
+            <img
+              src={selectedCard.image}
+              alt={selectedCard.name}
+              style={{ width: "100%", borderRadius: "12px" }}
+            />
+          )}
           <p style={{ marginTop: "1rem" }}>How was it?</p>
-
           <div
             style={{
               display: "flex",
@@ -299,7 +349,11 @@ function App() {
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <div onClick={() => finishComparison(selectedCard)}>
                   <img
-                    src={selectedCard.images?.[0]?.url}
+                    src={
+                      selectedCard.image ||
+                      selectedCard.images?.[0]?.url ||
+                      selectedCard.album?.images?.[0]?.url
+                    }
                     alt={selectedCard.name}
                     style={{
                       width: "100px",
@@ -312,7 +366,11 @@ function App() {
 
                 <div onClick={() => finishComparison(comparisonTarget)}>
                   <img
-                    src={comparisonTarget.images?.[0]?.url}
+                    src={
+                      comparisonTarget.image ||
+                      comparisonTarget.images?.[0]?.url ||
+                      comparisonTarget.album?.images?.[0]?.url
+                    }
                     alt={comparisonTarget.name}
                     style={{
                       width: "100px",
@@ -405,6 +463,7 @@ function App() {
                     className="m-2"
                     onClick={() => {
                       setSelectedCard(album);
+                      setSelectedType("album"); // or "artist"
                       setShowModal(true);
                     }}
                     style={{
@@ -425,25 +484,100 @@ function App() {
             <h3 className="mt-4">Tracks</h3>
             <Row className="mx-2 row row-cols-4">
               {tracks.map((track, i) => (
-                <Card key={i} className="m-2">
-                  <Card.Img src={track.image} />
-                  <Card.Body>
-                    <Card.Title>{track.name}</Card.Title>
-                    <Card.Text>By {track.artist}</Card.Text>
-                  </Card.Body>
-                </Card>
+                <div key={i} style={{ position: "relative" }}>
+                  {ratings[track.id] && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        backgroundColor:
+                          ratings[track.id].category === "liked"
+                            ? "#81C784"
+                            : ratings[track.id].category === "fine"
+                            ? "#FFF176"
+                            : "#E57373",
+                        color: "#000",
+                        padding: "4px 8px",
+                        borderRadius: 12,
+                        fontSize: 12,
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    >
+                      {ratings[track.id].score.toFixed(1)}
+                    </div>
+                  )}
+
+                  <Card
+                    className="m-2"
+                    onClick={() => {
+                      setSelectedCard(track);
+                      setSelectedType("track"); // or "artist"
+                      setShowModal(true);
+                    }}
+                    style={{
+                      cursor: "pointer",
+                      position: "relative",
+                      zIndex: 1,
+                    }}
+                  >
+                    <Card.Img src={track.image} />
+                    <Card.Body>
+                      <Card.Title>{track.name}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </div>
               ))}
             </Row>
 
             <h3 className="mt-4">Artists</h3>
             <Row className="mx-2 row row-cols-4">
               {artists.map((artist, i) => (
-                <Card key={i} className="m-2">
-                  {artist.image && <Card.Img src={artist.image} />}
-                  <Card.Body>
-                    <Card.Title>{artist.name}</Card.Title>
-                  </Card.Body>
-                </Card>
+                <div key={i} style={{ position: "relative" }}>
+                  {ratings[artist.id] && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        backgroundColor:
+                          ratings[artist.id].category === "liked"
+                            ? "#81C784"
+                            : ratings[artist.id].category === "fine"
+                            ? "#FFF176"
+                            : "#E57373",
+                        color: "#000",
+                        padding: "4px 8px",
+                        borderRadius: 12,
+                        fontSize: 12,
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    >
+                      {ratings[artist.id].score.toFixed(1)}
+                    </div>
+                  )}
+
+                  <Card
+                    className="m-2"
+                    onClick={() => {
+                      setSelectedCard(artist);
+                      setSelectedType("artist"); // or "artist"
+                      setShowModal(true);
+                    }}
+                    style={{
+                      cursor: "pointer",
+                      position: "relative",
+                      zIndex: 1,
+                    }}
+                  >
+                    <Card.Img src={artist.image} />
+                    <Card.Body>
+                      <Card.Title>{artist.name}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </div>
               ))}
             </Row>
           </>
@@ -457,29 +591,52 @@ function App() {
             ) : (
               <>
                 <h5>Liked</h5>
-                {renderRankedList("liked")}
+                {renderRankedList("liked", "album")}
 
                 <h5 className="mt-3">Fine</h5>
-                {renderRankedList("fine")}
+                {renderRankedList("fine", "album")}
 
                 <h5 className="mt-3">Disliked</h5>
-                {renderRankedList("disliked")}
+                {renderRankedList("disliked", "album")}
               </>
             )}
+
+            <h3>Your Track Rankings</h3>
+            <h5>Liked</h5>
+            {renderRankedList("liked", "track")}
+            <h5 className="mt-3">Fine</h5>
+            {renderRankedList("fine", "track")}
+            <h5 className="mt-3">Disliked</h5>
+            {renderRankedList("disliked", "track")}
+
+            <h3 className="mt-4">Your Artist Rankings</h3>
+            <h5>Liked</h5>
+            {renderRankedList("liked", "artist")}
+            <h5 className="mt-3">Fine</h5>
+            {renderRankedList("fine", "artist")}
+            <h5 className="mt-3">Disliked</h5>
+            {renderRankedList("disliked", "artist")}
           </>
         )}
       </Container>
     </div>
   );
-  function renderRankedList(category) {
+  function renderRankedList(category, type) {
+    const allRated =
+      type === "album"
+        ? ratedAlbums
+        : type === "track"
+        ? ratedTracks
+        : ratedArtists;
+
     const ranked = Object.entries(ratings)
-      .filter(([id, data]) => data.category === category)
+      .filter(([id, data]) => data.category === category && data.type === type)
       .sort((a, b) => b[1].score - a[1].score)
-      .map(([id]) => ratedAlbums.find((album) => album.id === id))
-      .filter(Boolean); // Remove nulls in case album not found
+      .map(([id]) => allRated.find((item) => item.id === id))
+      .filter(Boolean);
 
     if (ranked.length === 0) {
-      return <p>No albums rated in this category.</p>;
+      return <p>No {type}s rated in this category.</p>;
     }
 
     return (
@@ -511,7 +668,12 @@ function App() {
               >
                 <div style={{ width: "20px", color: "#aaa" }}>{index + 1}</div>
                 <img
-                  src={album.images?.[2]?.url}
+                  src={
+                    album.image ||
+                    album.images?.[2]?.url ||
+                    album.images?.[0]?.url ||
+                    album.album?.images?.[0]?.url
+                  }
                   alt={album.name}
                   style={{ width: "50px", height: "50px", borderRadius: "4px" }}
                 />
