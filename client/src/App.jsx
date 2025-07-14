@@ -589,39 +589,28 @@ function App() {
             {ratedAlbums.length === 0 ? (
               <p>You haven't rated any albums yet.</p>
             ) : (
-              <>
-                <h5>Liked</h5>
-                {renderRankedList("liked", "album")}
-
-                <h5 className="mt-3">Fine</h5>
-                {renderRankedList("fine", "album")}
-
-                <h5 className="mt-3">Disliked</h5>
-                {renderRankedList("disliked", "album")}
-              </>
+              renderRankedList("album") // single combined list per type
             )}
 
             <h3>Your Track Rankings</h3>
-            <h5>Liked</h5>
-            {renderRankedList("liked", "track")}
-            <h5 className="mt-3">Fine</h5>
-            {renderRankedList("fine", "track")}
-            <h5 className="mt-3">Disliked</h5>
-            {renderRankedList("disliked", "track")}
+            {ratedTracks.length === 0 ? (
+              <p>You haven't rated any tracks yet.</p>
+            ) : (
+              renderRankedList("track")
+            )}
 
             <h3 className="mt-4">Your Artist Rankings</h3>
-            <h5>Liked</h5>
-            {renderRankedList("liked", "artist")}
-            <h5 className="mt-3">Fine</h5>
-            {renderRankedList("fine", "artist")}
-            <h5 className="mt-3">Disliked</h5>
-            {renderRankedList("disliked", "artist")}
+            {ratedArtists.length === 0 ? (
+              <p>You haven't rated any artists yet.</p>
+            ) : (
+              renderRankedList("artist")
+            )}
           </>
         )}
       </Container>
     </div>
   );
-  function renderRankedList(category, type) {
+  function renderRankedList(type) {
     const allRated =
       type === "album"
         ? ratedAlbums
@@ -629,20 +618,21 @@ function App() {
         ? ratedTracks
         : ratedArtists;
 
-    const ranked = Object.entries(ratings)
-      .filter(([id, data]) => data.category === category && data.type === type)
+    // Filter ratings only for this type
+    const ratedItems = Object.entries(ratings)
+      .filter(([id, data]) => data.type === type)
       .sort((a, b) => b[1].score - a[1].score)
       .map(([id]) => allRated.find((item) => item.id === id))
       .filter(Boolean);
 
-    if (ranked.length === 0) {
-      return <p>No {type}s rated in this category.</p>;
+    if (ratedItems.length === 0) {
+      return <p>No {type}s rated yet.</p>;
     }
 
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        {ranked.map((album, index) => {
-          const scoreData = ratings[album.id];
+        {ratedItems.map((item, index) => {
+          const scoreData = ratings[item.id];
           let scoreColor = "#81C784"; // green for liked
 
           if (scoreData.category === "fine") scoreColor = "#FFD54F"; // yellow
@@ -650,7 +640,7 @@ function App() {
 
           return (
             <div
-              key={album.id}
+              key={item.id}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -669,20 +659,20 @@ function App() {
                 <div style={{ width: "20px", color: "#aaa" }}>{index + 1}</div>
                 <img
                   src={
-                    album.image ||
-                    album.images?.[2]?.url ||
-                    album.images?.[0]?.url ||
-                    album.album?.images?.[0]?.url
+                    item.image ||
+                    item.images?.[2]?.url ||
+                    item.images?.[0]?.url ||
+                    item.album?.images?.[0]?.url
                   }
-                  alt={album.name}
+                  alt={item.name}
                   style={{ width: "50px", height: "50px", borderRadius: "4px" }}
                 />
                 <div>
                   <div style={{ fontWeight: "bold", color: "#1e1e1e" }}>
-                    {album.name}
+                    {item.name}
                   </div>
                   <div style={{ color: "#bbb", fontSize: "0.9em" }}>
-                    {album.artists?.[0]?.name}
+                    {item.artists?.[0]?.name}
                   </div>
                 </div>
               </div>
