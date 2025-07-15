@@ -1,38 +1,115 @@
+/* Import pixel font */
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap");
+
+body {
+  font-family: "Pixelify Sans", monospace;
+  background-color: #fffaf2; /* Cream background */
+  color: #3a2c29;
+  margin: 0;
+  padding: 0;
+}
+
 .App {
-  text-align: center;
+  padding: 24px;
+  background-color: #fffaf2;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Buttons */
+button,
+.btn {
+  font-family: inherit;
+  background-color: #fff0e6; /* Pale peach */
+  color: #3a2c29;
+  border: 2px solid #f4cbb2;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 16px;
+  box-shadow: 2px 2px 0 #eac1a8;
+  transition: all 0.2s ease-in-out;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+button:hover,
+.btn:hover {
+  background-color: #fff6f0;
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 #eac1a8;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Cards */
+.card {
+  background-color: #fff7ec; /* Creamier white */
+  border: 2px solid #f3d9c4;
+  border-radius: 14px;
+  box-shadow: 2px 2px 0 #e8cbb8;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 4px 0 #e8cbb8;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #5c463d;
+}
+
+.card-text {
+  font-size: 0.9rem;
+  color: #6a564f;
+}
+
+/* Modal */
+.modal-content {
+  background-color: #fff7ef;
+  border: 2px solid #f3d9c4;
+  border-radius: 16px;
+}
+
+/* Input */
+input,
+.form-control {
+  font-family: inherit;
+  background-color: #fff5ea;
+  border: 2px solid #f4cbb2;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+  color: #3a2c29;
+}
+
+/* Tabs */
+.btn-outline-primary {
+  background-color: transparent;
+  border: 2px solid #f4cbb2;
+  color: #c19178;
+}
+
+.btn-outline-primary:hover {
+  background-color: #fff5ea;
+}
+
+/* Rating emojis */
+.rating-emoji {
+  font-size: 24px;
+  background-color: #fffef9;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  box-shadow: 2px 2px 0 #e6d3c3;
 }
 
-.App-link {
-  color: #61dafb;
+/* Scrollbar (subtle pastel) */
+::-webkit-scrollbar {
+  width: 8px;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+::-webkit-scrollbar-thumb {
+  background: #f3d9c4;
+  border-radius: 4px;
 }

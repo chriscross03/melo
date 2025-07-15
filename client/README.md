@@ -85,3 +85,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - ranking tracks and artists
 - combined each list to one so it looks cleaner
 - work on backend, put all the id's in .env file
+
+### 7/15
+
+- temporary top result in the making

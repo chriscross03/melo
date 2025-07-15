@@ -1,5 +1,4 @@
-import logo from "./logo.svg";
-import "./App.css";
+import logo from "./logo.png";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Container,
@@ -11,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
+import "./App.css";
 
 const CLIENT_ID = "0842ae76a4a94dca9c80f872d67ac85d";
 const CLIENT_SECRET = "eee5acafb8e8409fb2411f0975276fc8";
@@ -410,6 +410,18 @@ function App() {
       </Modal>
 
       <Container>
+        {/* Header with Logo */}
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <img
+            src={logo}
+            alt="Melo Logo"
+            style={{
+              width: "140px",
+              imageRendering: "pixelated",
+              marginBottom: "-50px",
+            }}
+          />
+        </div>
         {/* Tab Navigation */}
         <div
           style={{
@@ -470,13 +482,22 @@ function App() {
                         }}
                         style={{ cursor: "pointer" }}
                       >
-                        <Card.Img
-                          src={
-                            item.image ||
-                            item.images?.[0]?.url ||
-                            item.album?.images?.[0]?.url
-                          }
-                        />
+                        <div
+                          style={{
+                            padding: "4px",
+                            border: "3px dashed #decba4",
+                            backgroundColor: "#fffdf7",
+                            borderRadius: "12px",
+                          }}
+                        >
+                          <Card.Img
+                            src={
+                              item.image ||
+                              item.images?.[0]?.url ||
+                              item.album?.images?.[0]?.url
+                            }
+                          />
+                        </div>
                         <Card.Body>
                           <Card.Title>{item.name}</Card.Title>
                           {type !== "artist" && (
@@ -506,10 +527,10 @@ function App() {
                         right: 8,
                         backgroundColor:
                           ratings[album.id].category === "liked"
-                            ? "#81C784"
+                            ? "#b6e2a1"
                             : ratings[album.id].category === "fine"
-                            ? "#FFF176"
-                            : "#E57373",
+                            ? "#fff6a5"
+                            : "#f9bdbb",
                         color: "#000",
                         padding: "4px 8px",
                         borderRadius: 12,
@@ -535,7 +556,16 @@ function App() {
                       zIndex: 1,
                     }}
                   >
-                    <Card.Img src={album.images?.[0]?.url} />
+                    <div
+                      style={{
+                        padding: "4px",
+                        border: "3px dashed #decba4",
+                        backgroundColor: "#fffdf7",
+                        borderRadius: "12px",
+                      }}
+                    >
+                      <Card.Img src={album.images?.[0]?.url} />
+                    </div>
                     <Card.Body>
                       <Card.Title>{album.name}</Card.Title>
                       <Card.Text style={{ fontSize: "0.9em", color: "#555" }}>
@@ -588,7 +618,16 @@ function App() {
                       zIndex: 1,
                     }}
                   >
-                    <Card.Img src={track.image} />
+                    <div
+                      style={{
+                        padding: "4px",
+                        border: "3px dashed #decba4",
+                        backgroundColor: "#fffdf7",
+                        borderRadius: "12px",
+                      }}
+                    >
+                      <Card.Img src={track.image} />
+                    </div>
                     <Card.Body>
                       <Card.Title>{track.name}</Card.Title>
                       <Card.Text style={{ fontSize: "0.9em", color: "#555" }}>
@@ -641,7 +680,16 @@ function App() {
                       zIndex: 1,
                     }}
                   >
-                    <Card.Img src={artist.image} />
+                    <div
+                      style={{
+                        padding: "4px",
+                        border: "3px dashed #decba4",
+                        backgroundColor: "#fffdf7",
+                        borderRadius: "12px",
+                      }}
+                    >
+                      <Card.Img src={artist.image} />
+                    </div>
                     <Card.Body>
                       <Card.Title>{artist.name}</Card.Title>
                     </Card.Body>
