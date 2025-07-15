@@ -33,6 +33,7 @@ function App() {
   const [ratedArtists, setRatedArtists] = useState([]);
   const [selectedType, setSelectedType] = useState("album"); // "album", "track", or "artist"
   const [selectedRankingType, setSelectedRankingType] = useState("album"); // album | track | artist
+  const [topResults, setTopResults] = useState([]);
 
   const [currentTab, setCurrentTab] = useState("search");
 
@@ -102,6 +103,20 @@ function App() {
         image: item.album?.images?.[0]?.url || null,
       })) || []
     );
+
+    const topAlbum = data.albums?.items?.[0];
+    const topTrack = data.tracks?.items?.[0];
+    const topArtist = data.artists?.items?.[0];
+
+    const topResult = topAlbum
+      ? { type: "album", item: topAlbum }
+      : topTrack
+      ? { type: "track", item: topTrack }
+      : topArtist
+      ? { type: "artist", item: topArtist }
+      : null;
+
+    setTopResults(topResult ? [topResult] : []);
   }
   function handleRating(category) {
     if (!selectedCard?.id || !selectedType) return;
@@ -434,6 +449,50 @@ function App() {
               />
               <Button onClick={search}>Search</Button>
             </InputGroup>
+            {topResults.length > 0 && (
+              <>
+                <h3>Top Results</h3>
+                <Row className="mx-2 row row-cols-4">
+                  {topResults.map(({ type, item }, i) => (
+                    <div key={i} style={{ position: "relative" }}>
+                      <Card
+                        className="m-2"
+                        onClick={() => {
+                          setSelectedCard({
+                            ...item,
+                            image:
+                              item.image ||
+                              item.images?.[0]?.url ||
+                              item.album?.images?.[0]?.url,
+                          });
+                          setSelectedType(type);
+                          setShowModal(true);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <Card.Img
+                          src={
+                            item.image ||
+                            item.images?.[0]?.url ||
+                            item.album?.images?.[0]?.url
+                          }
+                        />
+                        <Card.Body>
+                          <Card.Title>{item.name}</Card.Title>
+                          {type !== "artist" && (
+                            <Card.Text
+                              style={{ fontSize: "0.9em", color: "#555" }}
+                            >
+                              {item.artists?.[0]?.name}
+                            </Card.Text>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </div>
+                  ))}
+                </Row>
+              </>
+            )}
 
             <h3>Albums</h3>
             <Row className="mx-2 row row-cols-4">
