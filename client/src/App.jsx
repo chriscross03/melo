@@ -32,6 +32,7 @@ function App() {
   const [ratedTracks, setRatedTracks] = useState([]);
   const [ratedArtists, setRatedArtists] = useState([]);
   const [selectedType, setSelectedType] = useState("album"); // "album", "track", or "artist"
+  const [selectedRankingType, setSelectedRankingType] = useState("album"); // album | track | artist
 
   const [currentTab, setCurrentTab] = useState("search");
 
@@ -594,26 +595,71 @@ function App() {
 
         {currentTab === "rankings" && (
           <>
-            <h3>Your Album Rankings</h3>
-            {ratedAlbums.length === 0 ? (
-              <p>You haven't rated any albums yet.</p>
-            ) : (
-              renderRankedList("album") // single combined list per type
-            )}
+            <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
+              My Rankings
+            </h3>
 
-            <h3>Your Track Rankings</h3>
-            {ratedTracks.length === 0 ? (
-              <p>You haven't rated any tracks yet.</p>
-            ) : (
-              renderRankedList("track")
-            )}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <Button
+                variant={
+                  selectedRankingType === "album"
+                    ? "primary"
+                    : "outline-primary"
+                }
+                onClick={() => setSelectedRankingType("album")}
+                style={{ marginRight: "10px" }}
+              >
+                Albums
+              </Button>
+              <Button
+                variant={
+                  selectedRankingType === "track"
+                    ? "primary"
+                    : "outline-primary"
+                }
+                onClick={() => setSelectedRankingType("track")}
+                style={{ marginRight: "10px" }}
+              >
+                Tracks
+              </Button>
+              <Button
+                variant={
+                  selectedRankingType === "artist"
+                    ? "primary"
+                    : "outline-primary"
+                }
+                onClick={() => setSelectedRankingType("artist")}
+              >
+                Artists
+              </Button>
+            </div>
 
-            <h3 className="mt-4">Your Artist Rankings</h3>
-            {ratedArtists.length === 0 ? (
-              <p>You haven't rated any artists yet.</p>
-            ) : (
-              renderRankedList("artist")
-            )}
+            {selectedRankingType === "album" &&
+              (ratedAlbums.length === 0 ? (
+                <p>You haven't rated any albums yet.</p>
+              ) : (
+                renderRankedList("album")
+              ))}
+
+            {selectedRankingType === "track" &&
+              (ratedTracks.length === 0 ? (
+                <p>You haven't rated any tracks yet.</p>
+              ) : (
+                renderRankedList("track")
+              ))}
+
+            {selectedRankingType === "artist" &&
+              (ratedArtists.length === 0 ? (
+                <p>You haven't rated any artists yet.</p>
+              ) : (
+                renderRankedList("artist")
+              ))}
           </>
         )}
       </Container>
