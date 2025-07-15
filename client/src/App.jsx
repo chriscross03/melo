@@ -88,6 +88,7 @@ function App() {
       data.albums?.items?.map((item) => ({
         id: item.id,
         name: item.name,
+        artist: item.artists?.[0]?.name || "Unknown",
         images: item.images || [], // You use images[0] in JSX
       })) || []
     );
@@ -477,6 +478,9 @@ function App() {
                     <Card.Img src={album.images?.[0]?.url} />
                     <Card.Body>
                       <Card.Title>{album.name}</Card.Title>
+                      <Card.Text style={{ fontSize: "0.9em", color: "#555" }}>
+                        {album.artist}
+                      </Card.Text>
                     </Card.Body>
                   </Card>
                 </div>
@@ -527,6 +531,9 @@ function App() {
                     <Card.Img src={track.image} />
                     <Card.Body>
                       <Card.Title>{track.name}</Card.Title>
+                      <Card.Text style={{ fontSize: "0.9em", color: "#555" }}>
+                        {track.artist}
+                      </Card.Text>
                     </Card.Body>
                   </Card>
                 </div>
@@ -669,13 +676,34 @@ function App() {
                   alt={item.name}
                   style={{ width: "50px", height: "50px", borderRadius: "4px" }}
                 />
-                <div>
-                  <div style={{ fontWeight: "bold", color: "#1e1e1e" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#1e1e1e",
+                      lineHeight: "1.2",
+                    }}
+                  >
                     {item.name}
                   </div>
-                  <div style={{ color: "#bbb", fontSize: "0.9em" }}>
-                    {item.artists?.[0]?.name}
-                  </div>
+
+                  {(type === "album" || type === "track") && item.artist && (
+                    <div
+                      style={{
+                        color: "#bbb",
+                        fontSize: "0.9em",
+                        marginTop: "2px",
+                      }}
+                    >
+                      {item.artist}
+                    </div>
+                  )}
                 </div>
               </div>
 
