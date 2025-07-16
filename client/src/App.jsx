@@ -7,6 +7,7 @@ import {
   Button,
   Row,
   Card,
+  Col,
 } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
@@ -461,26 +462,192 @@ function App() {
               />
               <Button onClick={search}>Search</Button>
             </InputGroup>
+
             {topResults.length > 0 && (
               <>
-                <h3>Top Results</h3>
+                <Row className="mx-2">
+                  <Col md={6} className="d-flex flex-column">
+                    <h4>Top Result</h4>
+                    <div
+                      className="flex-grow-1 d-flex flex-column"
+                      style={{ height: "100%" }}
+                    >
+                      {topResults.slice(0, 1).map(({ type, item }, i) => (
+                        <Card
+                          key={i}
+                          className="h-100 d-flex flex-column"
+                          onClick={() => {
+                            setSelectedCard({
+                              ...item,
+                              image:
+                                item.image ||
+                                item.images?.[0]?.url ||
+                                item.album?.images?.[0]?.url,
+                            });
+                            setSelectedType(type);
+                            setShowModal(true);
+                          }}
+                          style={{
+                            cursor: "pointer",
+                            height: "100%",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "fit-content",
+                              padding: "4px",
+                              border: "3px dashed #decba4",
+                              backgroundColor: "#fffdf7",
+                              borderRadius: "12px",
+                              display: "inline-block",
+                            }}
+                          >
+                            <Card.Img
+                              src={
+                                item.image ||
+                                item.images?.[0]?.url ||
+                                item.album?.images?.[0]?.url
+                              }
+                              style={{
+                                width: "250px",
+                                height: "250px",
+                                objectFit: "contain",
+                                borderRadius: "12px",
+                                backgroundColor: "#fffdf7",
+                                display: "block",
+                              }}
+                            />
+                          </div>
+                          <Card.Body>
+                            <Card.Title
+                              style={{ fontSize: "2em", fontWeight: "bold" }}
+                            >
+                              {item.name}
+                            </Card.Title>
+                            {type !== "artist" && (
+                              <Card.Text
+                                style={{ fontSize: "1.2em", color: "#555" }}
+                              >
+                                {item.artists?.[0]?.name}
+                              </Card.Text>
+                            )}
+                          </Card.Body>
+                        </Card>
+                      ))}
+                    </div>
+                  </Col>
+
+                  <Col md={6}>
+                    <h4>Tracks</h4>
+                    <div style={{ maxHeight: "100%", overflowY: "auto" }}>
+                      {tracks.slice(0, 6).map((track, i) => (
+                        <div
+                          key={i}
+                          className="d-flex align-items-start mb-3"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            setSelectedCard(track);
+                            setSelectedType("track");
+                            setShowModal(true);
+                          }}
+                        >
+                          <div
+                            style={{
+                              position: "relative",
+                              width: "64px",
+                              height: "64px",
+                              marginRight: "12px",
+                            }}
+                          >
+                            {ratings[track.id] && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: 0,
+                                  right: 0,
+                                  backgroundColor:
+                                    ratings[track.id].category === "liked"
+                                      ? "#81C784"
+                                      : ratings[track.id].category === "fine"
+                                      ? "#FFF176"
+                                      : "#E57373",
+                                  color: "#000",
+                                  padding: "2px 6px",
+                                  borderRadius: 12,
+                                  fontSize: 10,
+                                  fontWeight: "bold",
+                                  zIndex: 2,
+                                }}
+                              >
+                                {ratings[track.id].score.toFixed(1)}
+                              </div>
+                            )}
+                            <img
+                              src={track.image}
+                              alt={track.name}
+                              style={{
+                                width: "64px",
+                                height: "64px",
+                                borderRadius: "8px",
+                                border: "2px dashed #decba4",
+                                backgroundColor: "#fffdf7",
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: "bold" }}>
+                              {track.name}
+                            </div>
+                            <div style={{ fontSize: "0.9em", color: "#555" }}>
+                              {track.artist}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Col>
+                </Row>
+
+                <h3 className="mt-4">Artists</h3>
                 <Row className="mx-2 row row-cols-4">
-                  {topResults.map(({ type, item }, i) => (
+                  {artists.map((artist, i) => (
                     <div key={i} style={{ position: "relative" }}>
+                      {ratings[artist.id] && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            backgroundColor:
+                              ratings[artist.id].category === "liked"
+                                ? "#81C784"
+                                : ratings[artist.id].category === "fine"
+                                ? "#FFF176"
+                                : "#E57373",
+                            color: "#000",
+                            padding: "4px 8px",
+                            borderRadius: 12,
+                            fontSize: 12,
+                            fontWeight: "bold",
+                            zIndex: 2,
+                          }}
+                        >
+                          {ratings[artist.id].score.toFixed(1)}
+                        </div>
+                      )}
+
                       <Card
                         className="m-2"
                         onClick={() => {
-                          setSelectedCard({
-                            ...item,
-                            image:
-                              item.image ||
-                              item.images?.[0]?.url ||
-                              item.album?.images?.[0]?.url,
-                          });
-                          setSelectedType(type);
+                          setSelectedCard(artist);
+                          setSelectedType("artist"); // or "artist"
                           setShowModal(true);
                         }}
-                        style={{ cursor: "pointer" }}
+                        style={{
+                          cursor: "pointer",
+                          position: "relative",
+                          zIndex: 1,
+                        }}
                       >
                         <div
                           style={{
@@ -490,23 +657,73 @@ function App() {
                             borderRadius: "12px",
                           }}
                         >
-                          <Card.Img
-                            src={
-                              item.image ||
-                              item.images?.[0]?.url ||
-                              item.album?.images?.[0]?.url
-                            }
-                          />
+                          <Card.Img src={artist.image} />
                         </div>
                         <Card.Body>
-                          <Card.Title>{item.name}</Card.Title>
-                          {type !== "artist" && (
-                            <Card.Text
-                              style={{ fontSize: "0.9em", color: "#555" }}
-                            >
-                              {item.artists?.[0]?.name}
-                            </Card.Text>
-                          )}
+                          <Card.Title>{artist.name}</Card.Title>
+                        </Card.Body>
+                      </Card>
+                    </div>
+                  ))}
+                </Row>
+                <h3>Albums</h3>
+                <Row className="mx-2 row row-cols-4">
+                  {albums.map((album, i) => (
+                    <div key={i} style={{ position: "relative" }}>
+                      {ratings[album.id] && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: 8,
+                            right: 8,
+                            backgroundColor:
+                              ratings[album.id].category === "liked"
+                                ? "#b6e2a1"
+                                : ratings[album.id].category === "fine"
+                                ? "#fff6a5"
+                                : "#f9bdbb",
+                            color: "#000",
+                            padding: "4px 8px",
+                            borderRadius: 12,
+                            fontSize: 12,
+                            fontWeight: "bold",
+                            zIndex: 2,
+                          }}
+                        >
+                          {ratings[album.id].score.toFixed(1)}
+                        </div>
+                      )}
+
+                      <Card
+                        className="m-2"
+                        onClick={() => {
+                          setSelectedCard(album);
+                          setSelectedType("album"); // or "artist"
+                          setShowModal(true);
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          position: "relative",
+                          zIndex: 1,
+                        }}
+                      >
+                        <div
+                          style={{
+                            padding: "4px",
+                            border: "3px dashed #decba4",
+                            backgroundColor: "#fffdf7",
+                            borderRadius: "12px",
+                          }}
+                        >
+                          <Card.Img src={album.images?.[0]?.url} />
+                        </div>
+                        <Card.Body>
+                          <Card.Title>{album.name}</Card.Title>
+                          <Card.Text
+                            style={{ fontSize: "0.9em", color: "#555" }}
+                          >
+                            {album.artist}
+                          </Card.Text>
                         </Card.Body>
                       </Card>
                     </div>
@@ -514,189 +731,6 @@ function App() {
                 </Row>
               </>
             )}
-
-            <h3>Albums</h3>
-            <Row className="mx-2 row row-cols-4">
-              {albums.map((album, i) => (
-                <div key={i} style={{ position: "relative" }}>
-                  {ratings[album.id] && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        backgroundColor:
-                          ratings[album.id].category === "liked"
-                            ? "#b6e2a1"
-                            : ratings[album.id].category === "fine"
-                            ? "#fff6a5"
-                            : "#f9bdbb",
-                        color: "#000",
-                        padding: "4px 8px",
-                        borderRadius: 12,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                        zIndex: 2,
-                      }}
-                    >
-                      {ratings[album.id].score.toFixed(1)}
-                    </div>
-                  )}
-
-                  <Card
-                    className="m-2"
-                    onClick={() => {
-                      setSelectedCard(album);
-                      setSelectedType("album"); // or "artist"
-                      setShowModal(true);
-                    }}
-                    style={{
-                      cursor: "pointer",
-                      position: "relative",
-                      zIndex: 1,
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "4px",
-                        border: "3px dashed #decba4",
-                        backgroundColor: "#fffdf7",
-                        borderRadius: "12px",
-                      }}
-                    >
-                      <Card.Img src={album.images?.[0]?.url} />
-                    </div>
-                    <Card.Body>
-                      <Card.Title>{album.name}</Card.Title>
-                      <Card.Text style={{ fontSize: "0.9em", color: "#555" }}>
-                        {album.artist}
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </div>
-              ))}
-            </Row>
-
-            <h3 className="mt-4">Tracks</h3>
-            <Row className="mx-2 row row-cols-4">
-              {tracks.map((track, i) => (
-                <div key={i} style={{ position: "relative" }}>
-                  {ratings[track.id] && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        backgroundColor:
-                          ratings[track.id].category === "liked"
-                            ? "#81C784"
-                            : ratings[track.id].category === "fine"
-                            ? "#FFF176"
-                            : "#E57373",
-                        color: "#000",
-                        padding: "4px 8px",
-                        borderRadius: 12,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                        zIndex: 2,
-                      }}
-                    >
-                      {ratings[track.id].score.toFixed(1)}
-                    </div>
-                  )}
-
-                  <Card
-                    className="m-2"
-                    onClick={() => {
-                      setSelectedCard(track);
-                      setSelectedType("track"); // or "artist"
-                      setShowModal(true);
-                    }}
-                    style={{
-                      cursor: "pointer",
-                      position: "relative",
-                      zIndex: 1,
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "4px",
-                        border: "3px dashed #decba4",
-                        backgroundColor: "#fffdf7",
-                        borderRadius: "12px",
-                      }}
-                    >
-                      <Card.Img src={track.image} />
-                    </div>
-                    <Card.Body>
-                      <Card.Title>{track.name}</Card.Title>
-                      <Card.Text style={{ fontSize: "0.9em", color: "#555" }}>
-                        {track.artist}
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </div>
-              ))}
-            </Row>
-
-            <h3 className="mt-4">Artists</h3>
-            <Row className="mx-2 row row-cols-4">
-              {artists.map((artist, i) => (
-                <div key={i} style={{ position: "relative" }}>
-                  {ratings[artist.id] && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        backgroundColor:
-                          ratings[artist.id].category === "liked"
-                            ? "#81C784"
-                            : ratings[artist.id].category === "fine"
-                            ? "#FFF176"
-                            : "#E57373",
-                        color: "#000",
-                        padding: "4px 8px",
-                        borderRadius: 12,
-                        fontSize: 12,
-                        fontWeight: "bold",
-                        zIndex: 2,
-                      }}
-                    >
-                      {ratings[artist.id].score.toFixed(1)}
-                    </div>
-                  )}
-
-                  <Card
-                    className="m-2"
-                    onClick={() => {
-                      setSelectedCard(artist);
-                      setSelectedType("artist"); // or "artist"
-                      setShowModal(true);
-                    }}
-                    style={{
-                      cursor: "pointer",
-                      position: "relative",
-                      zIndex: 1,
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "4px",
-                        border: "3px dashed #decba4",
-                        backgroundColor: "#fffdf7",
-                        borderRadius: "12px",
-                      }}
-                    >
-                      <Card.Img src={artist.image} />
-                    </div>
-                    <Card.Body>
-                      <Card.Title>{artist.name}</Card.Title>
-                    </Card.Body>
-                  </Card>
-                </div>
-              ))}
-            </Row>
           </>
         )}
 
