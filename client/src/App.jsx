@@ -490,8 +490,32 @@ function App() {
                           style={{
                             cursor: "pointer",
                             height: "100%",
+                            position: "relative",
                           }}
                         >
+                          {ratings[item.id] && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: 12,
+                                right: 12,
+                                backgroundColor:
+                                  ratings[item.id].category === "liked"
+                                    ? "#81C784"
+                                    : ratings[item.id].category === "fine"
+                                    ? "#FFF176"
+                                    : "#E57373",
+                                color: "#000",
+                                padding: "4px 8px",
+                                borderRadius: 12,
+                                fontSize: 12,
+                                fontWeight: "bold",
+                                zIndex: 2,
+                              }}
+                            >
+                              {ratings[item.id].score.toFixed(1)}
+                            </div>
+                          )}
                           <div
                             style={{
                               width: "fit-content",
