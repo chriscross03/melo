@@ -89,3 +89,11 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 ### 7/15
 
 - temporary top result in the making
+
+### 7/16
+
+- temp top result and tracks reorganized
+- make rating appear for top result
+- fix top result algorithm (only showing most relevant album rn)
+- create only 4 artists and and 4 albums showing and create like a dropdown menu or a see more menu or filtered sections for each category.
+- backend always
