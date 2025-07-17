@@ -13,8 +13,8 @@ import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import "./App.css";
 
-const CLIENT_ID = "0842ae76a4a94dca9c80f872d67ac85d";
-const CLIENT_SECRET = "eee5acafb8e8409fb2411f0975276fc8";
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
+const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
 
 function App() {
   const [searchInput, setSearchInput] = useState("");
