@@ -552,7 +552,9 @@ function App() {
                               <Card.Text
                                 style={{ fontSize: "1.2em", color: "#555" }}
                               >
-                                {item.artists?.[0]?.name}
+                                {item.album_type.charAt(0).toUpperCase() +
+                                  item.album_type.slice(1)}{" "}
+                                ~ {item.artists?.[0]?.name}
                               </Card.Text>
                             )}
                           </Card.Body>
