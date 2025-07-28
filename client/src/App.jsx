@@ -12,13 +12,10 @@ import {
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import "./App.css";
-
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
-const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
+import useSpotifyToken from "./hooks/useSpotifyToken";
 
 function App() {
   const [searchInput, setSearchInput] = useState("");
-  const [accessToken, setAccessToken] = useState("");
   const [albums, setAlbums] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [artists, setArtists] = useState([]);
@@ -35,27 +32,9 @@ function App() {
   const [selectedType, setSelectedType] = useState("album"); // "album", "track", or "artist"
   const [selectedRankingType, setSelectedRankingType] = useState("album"); // album | track | artist
   const [topResults, setTopResults] = useState([]);
-
   const [currentTab, setCurrentTab] = useState("search");
 
-  useEffect(() => {
-    // API Access Token
-    var authParameters = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body:
-        "grant_type=client_credentials&client_id=" +
-        CLIENT_ID +
-        "&client_secret=" +
-        CLIENT_SECRET,
-    };
-    fetch("https://accounts.spotify.com/api/token", authParameters)
-      .then((result) => result.json())
-      .then((data) => setAccessToken(data.access_token));
-  }, []);
-
+  const accessToken = useSpotifyToken();
   // Search
   async function search() {
     console.log("Search for " + searchInput);
