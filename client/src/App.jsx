@@ -282,71 +282,105 @@ function App() {
               style={{ width: "100%", borderRadius: "12px" }}
             />
           )}
-          <p style={{ marginTop: "1rem" }}>How was it?</p>
+          <p
+            style={{
+              marginTop: "1rem",
+              textAlign: "center",
+              fontSize: "1.1em",
+              color: "#333",
+            }}
+          >
+            How was this listen?
+          </p>
           <div
             style={{
               display: "flex",
-              justifyContent: "space-around",
-              marginTop: "1rem",
-              textAlign: "center",
+              justifyContent: "space-between",
+              marginTop: "1.5rem",
+              gap: "16px",
             }}
           >
-            <div onClick={() => handleRating("liked")}>
+            <div
+              onClick={() => handleRating("liked")}
+              style={{
+                flex: 1,
+                padding: "16px",
+                backgroundColor: "#e6f4ea",
+                borderRadius: "12px",
+                border: "1px solid #cde3d1",
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.1)")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+            >
               <div
                 style={{
-                  backgroundColor: "#C8E6C9",
-                  borderRadius: "50%",
-                  width: 60,
-                  height: 60,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 24,
-                  marginBottom: 8,
+                  fontSize: "1.5em",
+                  fontWeight: "600",
+                  color: "#356859",
                 }}
               >
-                👍
+                Really liked it!
               </div>
-              <div style={{ fontSize: 14, color: "#444" }}>I liked it!</div>
             </div>
 
-            <div onClick={() => handleRating("fine")}>
+            <div
+              onClick={() => handleRating("fine")}
+              style={{
+                flex: 1,
+                padding: "16px",
+                backgroundColor: "#fff9e6",
+                borderRadius: "12px",
+                border: "1px solid #f0e4bc",
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.1)")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+            >
               <div
                 style={{
-                  backgroundColor: "#FFF9C4",
-                  borderRadius: "50%",
-                  width: 60,
-                  height: 60,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 24,
-                  marginBottom: 8,
+                  fontSize: "1.5em",
+                  fontWeight: "600",
+                  color: "#a17900",
                 }}
               >
-                😐
+                It was fine
               </div>
-              <div style={{ fontSize: 14, color: "#444" }}>It was fine</div>
             </div>
 
-            <div onClick={() => handleRating("disliked")}>
+            <div
+              onClick={() => handleRating("disliked")}
+              style={{
+                flex: 1,
+                padding: "16px",
+                backgroundColor: "#fceaea",
+                borderRadius: "12px",
+                border: "1px solid #f2c0c0",
+                textAlign: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.1)")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+            >
               <div
                 style={{
-                  backgroundColor: "#FFCDD2",
-                  borderRadius: "50%",
-                  width: 60,
-                  height: 60,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 24,
-                  marginBottom: 8,
+                  fontSize: "1.5em",
+                  fontWeight: "600",
+                  color: "#b93e3e",
                 }}
               >
-                👎
-              </div>
-              <div style={{ fontSize: 14, color: "#444" }}>
-                I didn’t like it
+                Didn’t like it
               </div>
             </div>
           </div>
@@ -366,40 +400,68 @@ function App() {
         <Modal.Body>
           {comparisonTarget ? (
             <>
-              <div style={{ display: "flex", justifyContent: "space-around" }}>
-                <div onClick={() => finishComparison(selectedCard)}>
-                  <img
-                    src={
-                      selectedCard.image ||
-                      selectedCard.images?.[0]?.url ||
-                      selectedCard.album?.images?.[0]?.url
-                    }
-                    alt={selectedCard.name}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "20px",
+                  justifyContent: "center",
+                  alignItems: "stretch",
+                  marginTop: "10px",
+                }}
+              >
+                {[selectedCard, comparisonTarget].map((item, idx) => (
+                  <div
+                    key={item.id}
+                    onClick={() => finishComparison(item)}
                     style={{
-                      width: "100px",
-                      borderRadius: "12px",
-                      marginBottom: 8,
+                      flex: 1,
+                      maxWidth: "200px",
+                      height: "300px",
+                      padding: "16px",
+                      backgroundColor: "#fdfdfd",
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "16px",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                      textAlign: "center",
+                      transition: "all 0.2s ease-in-out",
                     }}
-                  />
-                  <p>{selectedCard.name}</p>
-                </div>
-
-                <div onClick={() => finishComparison(comparisonTarget)}>
-                  <img
-                    src={
-                      comparisonTarget.image ||
-                      comparisonTarget.images?.[0]?.url ||
-                      comparisonTarget.album?.images?.[0]?.url
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.boxShadow =
+                        "0 6px 18px rgba(0,0,0,0.15)")
                     }
-                    alt={comparisonTarget.name}
-                    style={{
-                      width: "100px",
-                      borderRadius: "12px",
-                      marginBottom: 8,
-                    }}
-                  />
-                  <p>{comparisonTarget.name}</p>
-                </div>
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.boxShadow =
+                        "0 4px 12px rgba(0,0,0,0.08)")
+                    }
+                  >
+                    <img
+                      src={
+                        item.image ||
+                        item.images?.[0]?.url ||
+                        item.album?.images?.[0]?.url
+                      }
+                      alt={item.name}
+                      style={{
+                        width: "100%",
+                        height: "200px",
+                        objectFit: "cover",
+                        borderRadius: "12px",
+                        backgroundColor: "#fffdf7",
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontWeight: "600",
+                        fontSize: "1.1em",
+                        marginTop: "10px",
+                        color: "#333",
+                      }}
+                    >
+                      {item.name}
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           ) : (
@@ -680,10 +742,19 @@ function App() {
                             padding: "4px",
                             border: "3px dashed #decba4",
                             backgroundColor: "#fffdf7",
-                            borderRadius: "12px",
+                            borderRadius: "50%",
                           }}
                         >
-                          <Card.Img src={artist.image} />
+                          <Card.Img
+                            src={artist.image}
+                            style={{
+                              width: "100%",
+                              height: "250px",
+                              objectFit: "cover",
+                              borderRadius: "50%",
+                              backgroundColor: "#fffdf7",
+                            }}
+                          />
                         </div>
                         <Card.Body>
                           <Card.Title>{artist.name}</Card.Title>
