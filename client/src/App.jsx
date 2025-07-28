@@ -12,8 +12,11 @@ import {
 import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import "./App.css";
+
 import useSpotifyToken from "./hooks/useSpotifyToken";
 import searchSpotify from "./utils/searchSpotify";
+import handleRatingFn from "./utils/handleRating";
+import finishComparisonFn from "./utils/finishComparison";
 
 function App() {
   const [searchInput, setSearchInput] = useState("");
@@ -49,138 +52,50 @@ function App() {
   }
 
   function handleRating(category) {
-    if (!selectedCard?.id || !selectedType) return;
-
-    const id = selectedCard.id;
-
-    // Determine the correct setRatedX function
-    const setRatedFn =
-      selectedType === "album"
-        ? setRatedAlbums
-        : selectedType === "track"
-        ? setRatedTracks
-        : setRatedArtists;
-
-    // Add to rated list if not already there
-    setRatedFn((prev) => {
-      if (prev.find((item) => item.id === id)) return prev;
-      return [...prev, selectedCard];
+    handleRatingFn({
+      category,
+      selectedCard,
+      selectedType,
+      ratings,
+      setRatings,
+      setShowModal,
+      setShowComparison,
+      setComparisonTarget,
+      setBinaryCompareQueue,
+      setBinaryIndexRange,
+      ratedAlbums,
+      ratedTracks,
+      ratedArtists,
+      albums,
+      tracks,
+      artists,
+      setRatedAlbums,
+      setRatedTracks,
+      setRatedArtists,
     });
-
-    // Find all items of same type and category
-    const sameCategoryIds = Object.keys(ratings).filter(
-      (rid) =>
-        rid !== id &&
-        ratings[rid].category === category &&
-        ratings[rid].type === selectedType
-    );
-
-    if (sameCategoryIds.length === 0) {
-      let startScore =
-        category === "fine" ? 5.0 : category === "disliked" ? 1.0 : 10.0;
-
-      setRatings((prev) => ({
-        ...prev,
-        [id]: { category, score: startScore, type: selectedType },
-      }));
-      setShowModal(false);
-      return;
-    }
-
-    const sortedIds = sameCategoryIds
-      .map((id) => ({ id, score: ratings[id].score }))
-      .sort((a, b) => b.score - a.score)
-      .map((entry) => entry.id);
-
-    setBinaryCompareQueue(sortedIds);
-    setBinaryIndexRange([0, sortedIds.length - 1]);
-
-    const allRated =
-      selectedType === "album"
-        ? ratedAlbums
-        : selectedType === "track"
-        ? ratedTracks
-        : ratedArtists;
-
-    const mid = Math.floor((0 + sortedIds.length - 1) / 2);
-    const target =
-      (selectedType === "album"
-        ? albums
-        : selectedType === "track"
-        ? tracks
-        : artists
-      ).find((a) => a.id === sortedIds[mid]) ||
-      allRated.find((a) => a.id === sortedIds[mid]);
-
-    setComparisonTarget(target);
-    setShowComparison(true);
-    setShowModal(false);
   }
 
   function finishComparison(preferred) {
-    if (!comparisonTarget || !selectedCard) return;
-
-    const id = selectedCard.id;
-    const category = ratings[comparisonTarget.id].category;
-    const type = selectedType;
-
-    const sortedEntries = binaryCompareQueue
-      .map((id) => ({
-        id,
-        score: ratings[id].score,
-      }))
-      .sort((a, b) => b.score - a.score);
-
-    let [min, max] = binaryIndexRange;
-    const mid = Math.floor((min + max) / 2);
-    const midId = sortedEntries[mid].id;
-
-    if (preferred.id === id) {
-      max = mid - 1;
-    } else {
-      min = mid + 1;
-    }
-
-    if (min > max) {
-      const newList = [...sortedEntries];
-      newList.splice(min, 0, { id });
-
-      let startScore =
-        category === "fine" ? 5.0 : category === "disliked" ? 1.0 : 10.0;
-      const newRatings = { ...ratings };
-
-      for (let i = 0; i < newList.length; i++) {
-        const itemId = newList[i].id;
-        newRatings[itemId] = {
-          category,
-          score: parseFloat((startScore - i * 0.1).toFixed(2)),
-          type,
-        };
-      }
-
-      setRatings(newRatings);
-      setShowComparison(false);
-      setBinaryCompareQueue([]);
-      return;
-    }
-
-    const nextMid = Math.floor((min + max) / 2);
-    const nextId = sortedEntries[nextMid].id;
-
-    const allRated =
-      type === "album"
-        ? ratedAlbums
-        : type === "track"
-        ? ratedTracks
-        : ratedArtists;
-
-    const nextTarget =
-      (type === "album" ? albums : type === "track" ? tracks : artists).find(
-        (a) => a.id === nextId
-      ) || allRated.find((a) => a.id === nextId);
-
-    setComparisonTarget(nextTarget);
-    setBinaryIndexRange([min, max]);
+    finishComparisonFn({
+      preferred,
+      selectedCard,
+      selectedType,
+      comparisonTarget,
+      binaryCompareQueue,
+      binaryIndexRange,
+      ratings,
+      setRatings,
+      setShowComparison,
+      setBinaryCompareQueue,
+      setBinaryIndexRange,
+      setComparisonTarget,
+      albums,
+      tracks,
+      artists,
+      ratedAlbums,
+      ratedTracks,
+      ratedArtists,
+    });
   }
 
   return (
