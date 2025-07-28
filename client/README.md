@@ -97,3 +97,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - fixed top result algorithm (only showing most relevant album rn), could still improve
 - create only 4 artists and and 4 albums showing and create like a dropdown menu or a see more menu or filtered sections for each category.
 - backend always
+
+### 7/28
+
+- took a break cuz family, today i took some feedback from mi amigos
+- working on backend next biggest goal
