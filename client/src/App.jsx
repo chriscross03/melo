@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import "./App.css";
 import useSpotifyToken from "./hooks/useSpotifyToken";
+import searchSpotify from "./utils/searchSpotify";
 
 function App() {
   const [searchInput, setSearchInput] = useState("");
@@ -36,68 +37,17 @@ function App() {
 
   const accessToken = useSpotifyToken();
   // Search
-  async function search() {
-    console.log("Search for " + searchInput);
-
-    var searchParameters = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + accessToken,
-      },
-    };
-
-    const data = await fetch(
-      "https://api.spotify.com/v1/search?q=" +
-        searchInput +
-        "&type=artist,track,album&limit=10",
-      searchParameters
-    ).then((response) => response.json());
-
-    // Log full response for debugging
-    console.log("Spotify API Response:", data);
-
-    // Set state with full required info
-    setArtists(
-      data.artists?.items?.map((item) => ({
-        id: item.id,
-        name: item.name,
-        image: item.images?.[0]?.url || null,
-      })) || []
-    );
-
-    setAlbums(
-      data.albums?.items?.map((item) => ({
-        id: item.id,
-        name: item.name,
-        artist: item.artists?.[0]?.name || "Unknown",
-        images: item.images || [], // You use images[0] in JSX
-      })) || []
-    );
-
-    setTracks(
-      data.tracks?.items?.map((item) => ({
-        id: item.id,
-        name: item.name,
-        artist: item.artists?.[0]?.name || "Unknown",
-        image: item.album?.images?.[0]?.url || null,
-      })) || []
-    );
-
-    const topAlbum = data.albums?.items?.[0];
-    const topTrack = data.tracks?.items?.[0];
-    const topArtist = data.artists?.items?.[0];
-
-    const topResult = topAlbum
-      ? { type: "album", item: topAlbum }
-      : topTrack
-      ? { type: "track", item: topTrack }
-      : topArtist
-      ? { type: "artist", item: topArtist }
-      : null;
-
-    setTopResults(topResult ? [topResult] : []);
+  function search() {
+    searchSpotify({
+      accessToken,
+      searchInput,
+      setAlbums,
+      setTracks,
+      setArtists,
+      setTopResults,
+    });
   }
+
   function handleRating(category) {
     if (!selectedCard?.id || !selectedType) return;
 
