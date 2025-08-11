@@ -40,6 +40,43 @@ function App() {
   const [selectedRankingType, setSelectedRankingType] = useState("album"); // album | track | artist
   const [topResults, setTopResults] = useState([]);
   const [currentTab, setCurrentTab] = useState("search");
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    const savedRatings = localStorage.getItem("ratings");
+    const savedRatedAlbums = localStorage.getItem("ratedAlbums");
+    const savedRatedTracks = localStorage.getItem("ratedTracks");
+    const savedRatedArtists = localStorage.getItem("ratedArtists");
+
+    console.log("Loading from localStorage:", {
+      savedRatings,
+      savedRatedAlbums,
+      savedRatedTracks,
+      savedRatedArtists,
+    });
+
+    if (savedRatings) setRatings(JSON.parse(savedRatings));
+    if (savedRatedAlbums) setRatedAlbums(JSON.parse(savedRatedAlbums));
+    if (savedRatedTracks) setRatedTracks(JSON.parse(savedRatedTracks));
+    if (savedRatedArtists) setRatedArtists(JSON.parse(savedRatedArtists));
+
+    setDataLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!dataLoaded) return;
+    console.log("Saving to localStorage:", {
+      ratings,
+      ratedAlbums,
+      ratedTracks,
+      ratedArtists,
+    });
+
+    localStorage.setItem("ratings", JSON.stringify(ratings));
+    localStorage.setItem("ratedAlbums", JSON.stringify(ratedAlbums));
+    localStorage.setItem("ratedTracks", JSON.stringify(ratedTracks));
+    localStorage.setItem("ratedArtists", JSON.stringify(ratedArtists));
+  }, [ratings, ratedAlbums, ratedTracks, ratedArtists]);
 
   const accessToken = useSpotifyToken();
   // Search
