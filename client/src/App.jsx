@@ -10,9 +10,7 @@ import {
   Col,
 } from "react-bootstrap";
 import { useState, useEffect } from "react";
-import { Modal } from "react-bootstrap";
 import "./App.css";
-import { Spinner } from "react-bootstrap";
 
 import useSpotifyToken from "./hooks/useSpotifyToken";
 import searchSpotify from "./utils/searchSpotify";
@@ -240,7 +238,11 @@ function App() {
 
             {loading ? (
               <div style={{ textAlign: "center", marginTop: "20px" }}>
-                <Spinner animation="border" variant="primary" />
+                <div className="pixel-spinner">
+                  <div className="pixel-square"></div>
+                  <div className="pixel-square"></div>
+                  <div className="pixel-square"></div>
+                </div>
                 <p style={{ color: "#777", marginTop: "10px" }}>Searching...</p>
               </div>
             ) : (
@@ -566,7 +568,7 @@ function App() {
 
         {currentTab === "rankings" && (
           <>
-            <h3 style={{ textAlign: "center", marginBottom: "20px" }}>
+            <h3 style={{ textAlign: "left", marginBottom: "20px" }}>
               My Rankings
             </h3>
 
