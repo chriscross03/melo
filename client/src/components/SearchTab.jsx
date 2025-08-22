@@ -351,17 +351,25 @@ function SearchTab({
         )
       )}
       {topResults.length === 0 && (
-        <p
+        <div
           style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh", // bigger to fill more of the blank area
             textAlign: "center",
-            marginTop: "20px",
             color: "#777",
           }}
         >
-          Try searching for <strong>"Taylor Swift"</strong>,{" "}
-          <strong>"Dark Side of the Moon"</strong>, or{" "}
-          <strong>"Bohemian Rhapsody"</strong> 🎵
-        </p>
+          <h1 style={{ fontSize: "3em", fontWeight: "bold" }}>
+            🎵 welcome to melo 🎵
+          </h1>
+          <p style={{ fontSize: "1.5em", maxWidth: "600px" }}>
+            Search for an artist, album, or track in the search bar above to
+            start ranking your favorites! ⬆
+          </p>
+        </div>
       )}
     </>
   );
