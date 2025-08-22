@@ -102,3 +102,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 - took a break cuz family, today i took some feedback from mi amigos
 - working on backend next biggest goal
+
+### 8/22
+
+- almost-final version
+- to deploy main branch to gh-pages branch do the following in main branch
+  - cd client
+  - npm run deploy
